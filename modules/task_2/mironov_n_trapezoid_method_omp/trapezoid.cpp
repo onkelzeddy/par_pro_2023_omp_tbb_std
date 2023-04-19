@@ -152,7 +152,6 @@ double d1_method_omp(
         x = bounds[0].first + h * i;
         result += h * f({x});
     }
-    
 
     result += (h/2.0) * (f({bounds[0].first}) + f({bounds[0].second}));
 
