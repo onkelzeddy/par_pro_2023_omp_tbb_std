@@ -147,9 +147,9 @@ double d1_method_Openmp(
 
     double result = 0;
 
-    #pragma omp parallel private(x) shared(h, bounds) reduction(+ : result)
+    #pragma omp parallel
     {
-        #pragma omp parallel for
+        #pragma omp parallel for private(x) shared(h, bounds) reduction(+ : result)
         for (int i = 1; i < N; i++) {
             x = bounds[0].first + h * i;
             result += h * f({x});
@@ -181,9 +181,9 @@ double d2_method_Openmp(
         f({bounds[0].first, bounds[1].second}) +
         f({bounds[0].second, bounds[1].first}));
 
-    #pragma omp parallel private(x, y) shared(h_for_x, h_for_y, bounds) reduction(+ : result)
+    #pragma omp parallel
     {
-        #pragma omp parallel for
+        #pragma omp parallel for private(x, y) shared(h_for_x, h_for_y, bounds) reduction(+ : result)
         for (int i = 1; i < N; i++) {
             x = bounds[0].first + h_for_x * i;
             result += 0.5 * (f({x, bounds[1].first}) +
@@ -232,9 +232,9 @@ double d3_method_Openmp(
         f({bounds[0].second, bounds[1].first, bounds[2].second}) +
         f({bounds[0].second, bounds[1].second, bounds[2].second}));
 
-    #pragma omp parallel private(x, y, z) shared(h_for_x, h_for_y, h_for_z, bounds) reduction(+ : result)
+    #pragma omp parallel
     {
-        #pragma omp parallel for
+        #pragma omp parallel for private(x, y, z) shared(h_for_x, h_for_y, h_for_z, bounds) reduction(+ : result)
         for (int i = 1; i < N; i++) {
             x = bounds[0].first + h_for_x * i;
             y = bounds[1].first + h_for_y * i;
