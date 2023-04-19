@@ -147,10 +147,13 @@ double d1_method_Openmp(
 
     double result = 0;
 
-    #pragma omp parallel for private(x) shared(h, bounds) reduction(+ : result)
-    for (int i = 1; i < N; i++) {
-        x = bounds[0].first + h * i;
-        result += h * f({x});
+    #pragma omp parallel private(x) shared(h, bounds) reduction(+ : result)
+    {
+        #pragma omp parallel for
+        for (int i = 1; i < N; i++) {
+            x = bounds[0].first + h * i;
+            result += h * f({x});
+        }
     }
 
     result += (h/2.0) * (f({bounds[0].first}) + f({bounds[0].second}));
@@ -178,20 +181,23 @@ double d2_method_Openmp(
         f({bounds[0].first, bounds[1].second}) +
         f({bounds[0].second, bounds[1].first}));
 
-    #pragma omp parallel for private(x, y) shared(h_for_x, h_for_y, bounds) reduction(+ : result)
-    for (int i = 1; i < N; i++) {
-        x = bounds[0].first + h_for_x * i;
-        result += 0.5 * (f({x, bounds[1].first}) +
-        f({x, bounds[1].second}));
+    #pragma omp parallel private(x, y) shared(h_for_x, h_for_y, bounds) reduction(+ : result)
+    {
+        #pragma omp parallel for
+        for (int i = 1; i < N; i++) {
+            x = bounds[0].first + h_for_x * i;
+            result += 0.5 * (f({x, bounds[1].first}) +
+            f({x, bounds[1].second}));
 
-        y = bounds[1].first + h_for_y * i;
+            y = bounds[1].first + h_for_y * i;
 
-        result += 0.5 * (f({bounds[0].first, y}) +
-        f({bounds[0].second, y}));
-        for (int j = 1; j < N; j++) {
-            y = bounds[1].first + h_for_y * j;
+            result += 0.5 * (f({bounds[0].first, y}) +
+            f({bounds[0].second, y}));
+            for (int j = 1; j < N; j++) {
+                y = bounds[1].first + h_for_y * j;
 
-            result += f({x, y});
+                result += f({x, y});
+            }
         }
     }
 
@@ -225,45 +231,48 @@ double d3_method_Openmp(
         f({bounds[0].second, bounds[1].second, bounds[2].first}) +
         f({bounds[0].second, bounds[1].first, bounds[2].second}) +
         f({bounds[0].second, bounds[1].second, bounds[2].second}));
-
-    #pragma omp parallel for private(x, y, z) shared(h_for_x, h_for_y, h_for_z, bounds) reduction(+ : result)
-    for (int i = 1; i < N; i++) {
-        x = bounds[0].first + h_for_x * i;
-        y = bounds[1].first + h_for_y * i;
-        z = bounds[2].first + h_for_z * i;
-
-        result += 0.25 *
-        (f({x, bounds[1].first, bounds[2].first}) +
-        f({x, bounds[1].second, bounds[2].second}));
-
-        result += 0.25 *
-        (f({bounds[0].first, y, bounds[2].first}) +
-        f({bounds[0].second, y, bounds[2].second}));
-
-        result += 0.25 *
-        (f({bounds[0].first, bounds[1].first, z}) +
-        f({bounds[0].second, bounds[1].second, z}));
-        for (int j = 1; j < N; j++) {
+    
+    #pragma omp parallel private(x, y, z) shared(h_for_x, h_for_y, h_for_z, bounds) reduction(+ : result)
+    {
+        #pragma omp parallel for
+        for (int i = 1; i < N; i++) {
             x = bounds[0].first + h_for_x * i;
-            z = bounds[2].first + h_for_z * j;
-
-            result += 0.5 * (f({x, bounds[1].first, z}) +
-            f({x, bounds[1].second, z}));
-
             y = bounds[1].first + h_for_y * i;
+            z = bounds[2].first + h_for_z * i;
 
-            result += 0.5 * (f({bounds[0].first, y, z}) +
-            f({bounds[0].second, y, z}));
+            result += 0.25 *
+            (f({x, bounds[1].first, bounds[2].first}) +
+            f({x, bounds[1].second, bounds[2].second}));
 
-            y = bounds[1].first + h_for_y * j;
+            result += 0.25 *
+            (f({bounds[0].first, y, bounds[2].first}) +
+            f({bounds[0].second, y, bounds[2].second}));
 
-            result += 0.5 * (f({x, y, bounds[2].first}) +
-            f({x, y, bounds[2].second}));
+            result += 0.25 *
+            (f({bounds[0].first, bounds[1].first, z}) +
+            f({bounds[0].second, bounds[1].second, z}));
+            for (int j = 1; j < N; j++) {
+                x = bounds[0].first + h_for_x * i;
+                z = bounds[2].first + h_for_z * j;
 
-            for (int s = 1; s < N; s++) {
-                z = bounds[2].first + h_for_z * s;
+                result += 0.5 * (f({x, bounds[1].first, z}) +
+                f({x, bounds[1].second, z}));
 
-                result += f({x, y, z});
+                y = bounds[1].first + h_for_y * i;
+
+                result += 0.5 * (f({bounds[0].first, y, z}) +
+                f({bounds[0].second, y, z}));
+
+                y = bounds[1].first + h_for_y * j;
+
+                result += 0.5 * (f({x, y, bounds[2].first}) +
+                f({x, y, bounds[2].second}));
+
+                for (int s = 1; s < N; s++) {
+                    z = bounds[2].first + h_for_z * s;
+
+                    result += f({x, y, z});
+                }
             }
         }
     }
