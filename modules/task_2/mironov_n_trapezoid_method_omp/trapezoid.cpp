@@ -231,7 +231,7 @@ double d3_method_Openmp(
         f({bounds[0].second, bounds[1].second, bounds[2].first}) +
         f({bounds[0].second, bounds[1].first, bounds[2].second}) +
         f({bounds[0].second, bounds[1].second, bounds[2].second}));
-    
+
     #pragma omp parallel private(x, y, z) shared(h_for_x, h_for_y, h_for_z, bounds) reduction(+ : result)
     {
         #pragma omp parallel for
