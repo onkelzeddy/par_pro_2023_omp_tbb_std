@@ -147,7 +147,7 @@ double d1_method_omp(
 
     double result = 0;
 
-    #pragma omp parallel for shared(h) reduction(+ : result)
+    #pragma omp parallel for shared(h, bounds, result)
     for (int i = 1; i < N; i++) {
         x = bounds[0].first + h * i;
         result += h * f({x});
@@ -172,7 +172,13 @@ double d2_method_omp(
 
     double result = 0;
 
-    #pragma omp parallel for shared(h_for_x, h_for_y) reduction(+ : result)
+    result += 0.25 *
+        (f({bounds[0].first, bounds[1].first}) +
+        f({bounds[0].second, bounds[1].second}) +
+        f({bounds[0].first, bounds[1].second}) +
+        f({bounds[0].second, bounds[1].first}));
+
+    #pragma omp parallel for shared(h_for_x, h_for_y, bounds,  result)
     for (int i = 1; i < N; i++) {
         x = bounds[0].first + h_for_x * i;
         result += 0.5 * (f({x, bounds[1].first}) +
@@ -188,12 +194,6 @@ double d2_method_omp(
             result += f({x, y});
         }
     }
-
-    result += 0.25 *
-        (f({bounds[0].first, bounds[1].first}) +
-        f({bounds[0].second, bounds[1].second}) +
-        f({bounds[0].first, bounds[1].second}) +
-        f({bounds[0].second, bounds[1].first}));
 
     result = result * h_for_x * h_for_y;
 
@@ -216,7 +216,17 @@ double d3_method_omp(
 
     double result = 0;
 
-    #pragma omp parallel for shared(h_for_x, h_for_y, h_for_z) reduction(+ : result)
+    result += 0.125 *
+        (f({bounds[0].first, bounds[1].first, bounds[2].first}) +
+        f({bounds[0].first, bounds[1].second, bounds[2].first}) +
+        f({bounds[0].first, bounds[1].first, bounds[2].second}) +
+        f({bounds[0].first, bounds[1].second, bounds[2].second}) +
+        f({bounds[0].second, bounds[1].first, bounds[2].first}) +
+        f({bounds[0].second, bounds[1].second, bounds[2].first}) +
+        f({bounds[0].second, bounds[1].first, bounds[2].second}) +
+        f({bounds[0].second, bounds[1].second, bounds[2].second}));
+
+    #pragma omp parallel for shared(h_for_x, h_for_y, h_for_z, bounds, result)
     for (int i = 1; i < N; i++) {
         x = bounds[0].first + h_for_x * i;
         y = bounds[1].first + h_for_y * i;
@@ -257,17 +267,6 @@ double d3_method_omp(
             }
         }
     }
-
-
-    result += 0.125 *
-        (f({bounds[0].first, bounds[1].first, bounds[2].first}) +
-        f({bounds[0].first, bounds[1].second, bounds[2].first}) +
-        f({bounds[0].first, bounds[1].first, bounds[2].second}) +
-        f({bounds[0].first, bounds[1].second, bounds[2].second}) +
-        f({bounds[0].second, bounds[1].first, bounds[2].first}) +
-        f({bounds[0].second, bounds[1].second, bounds[2].first}) +
-        f({bounds[0].second, bounds[1].first, bounds[2].second}) +
-        f({bounds[0].second, bounds[1].second, bounds[2].second}));
 
     result = result * h_for_x * h_for_y * h_for_z;
 
