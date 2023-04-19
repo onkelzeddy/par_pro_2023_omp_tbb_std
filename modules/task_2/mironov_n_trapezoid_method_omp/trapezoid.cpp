@@ -1,5 +1,5 @@
 // Copyright 2023 Mironov Nikita
-#include "../../../modules/task_1/mironov_n_trapezoid_method_omp/trapezoid.h"
+#include "../../../modules/task_2/mironov_n_trapezoid_method_omp/trapezoid.h"
 
 double d1_method(
     double (*f)(std::vector<double>),
