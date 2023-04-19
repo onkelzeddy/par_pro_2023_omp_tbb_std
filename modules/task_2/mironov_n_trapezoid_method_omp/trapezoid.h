@@ -30,17 +30,17 @@ double d3_method(
     const std::vector<std::pair<double, double>>& bounds,
     int N);
 
-double d1_method_omp(
+double d1_method_Openmp(
     double (*f)(std::vector<double>),
     const std::vector<std::pair<double, double>>& bounds,
     int N);
 
-double d2_method_omp(
+double d2_method_Openmp(
     double (*f)(std::vector<double>),
     const std::vector<std::pair<double, double>>& bounds,
     int N);
 
-double d3_method_omp(
+double d3_method_Openmp(
     double (*f)(std::vector<double>),
     const std::vector<std::pair<double, double>>& bounds,
     int N);

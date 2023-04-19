@@ -135,7 +135,7 @@ double d3_method(
     return result;
 }
 
-double d1_method_omp(
+double d1_method_Openmp(
     double (*f)(std::vector<double>),
     const std::vector<std::pair<double, double>>& bounds,
     int N) {
@@ -158,7 +158,7 @@ double d1_method_omp(
     return result;
 }
 
-double d2_method_omp(
+double d2_method_Openmp(
     double (*f)(std::vector<double>),
     const std::vector<std::pair<double, double>>& bounds,
     int N) {
@@ -200,7 +200,7 @@ double d2_method_omp(
     return result;
 }
 
-double d3_method_omp(
+double d3_method_Openmp(
     double (*f)(std::vector<double>),
     const std::vector<std::pair<double, double>>& bounds,
     int N) {
@@ -294,13 +294,13 @@ double trapezoid_method(
     }
 
     if (dimensions == 1 && useOMP == true) {
-        return d1_method_omp(f, bounds, N);
+        return d1_method_Openmp(f, bounds, N);
     }
     if (dimensions == 2 && useOMP == true) {
-        return d2_method_omp(f, bounds, N);
+        return d2_method_Openmp(f, bounds, N);
     }
     if (dimensions == 3 && useOMP == true) {
-        return d3_method_omp(f, bounds, N);
+        return d3_method_Openmp(f, bounds, N);
     }
     return 0;
 }
