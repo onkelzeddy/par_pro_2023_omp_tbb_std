@@ -143,13 +143,11 @@ double d1_method_omp(
 
     double h = (bounds[0].second - bounds[0].first)/doubleStepsCount;
 
-    double x = 0;
-
     double result = 0;
 
-    #pragma omp parallel for shared(h, bounds, result)
+    #pragma omp parallel for private(x) shared(h, bounds) reduction(+ : result)
     for (int i = 1; i < N; i++) {
-        x = bounds[0].first + h * i;
+        double x = bounds[0].first + h * i;
         result += h * f({x});
     }
 
@@ -167,9 +165,6 @@ double d2_method_omp(
     double h_for_x = (bounds[0].second - bounds[0].first)/doubleStepsCount;
     double h_for_y = (bounds[1].second - bounds[1].first)/doubleStepsCount;
 
-    double x = 0;
-    double y = 0;
-
     double result = 0;
 
     result += 0.25 *
@@ -178,13 +173,13 @@ double d2_method_omp(
         f({bounds[0].first, bounds[1].second}) +
         f({bounds[0].second, bounds[1].first}));
 
-    #pragma omp parallel for shared(h_for_x, h_for_y, bounds,  result)
+    #pragma omp parallel for private(x, y) shared(h_for_x, h_for_y, bounds) reduction(+ : result)
     for (int i = 1; i < N; i++) {
-        x = bounds[0].first + h_for_x * i;
+        double x = bounds[0].first + h_for_x * i;
         result += 0.5 * (f({x, bounds[1].first}) +
         f({x, bounds[1].second}));
 
-        y = bounds[1].first + h_for_y * i;
+        double y = bounds[1].first + h_for_y * i;
 
         result += 0.5 * (f({bounds[0].first, y}) +
         f({bounds[0].second, y}));
@@ -210,10 +205,6 @@ double d3_method_omp(
     double h_for_y = (bounds[1].second - bounds[1].first)/doubleStepsCount;
     double h_for_z = (bounds[2].second - bounds[2].first)/doubleStepsCount;
 
-    double x = 0;
-    double y = 0;
-    double z = 0;
-
     double result = 0;
 
     result += 0.125 *
@@ -226,11 +217,11 @@ double d3_method_omp(
         f({bounds[0].second, bounds[1].first, bounds[2].second}) +
         f({bounds[0].second, bounds[1].second, bounds[2].second}));
 
-    #pragma omp parallel for shared(h_for_x, h_for_y, h_for_z, bounds, result)
+    #pragma omp parallel for private(x, y, z) shared(h_for_x, h_for_y, h_for_z, bounds) reduction(+ : result)
     for (int i = 1; i < N; i++) {
-        x = bounds[0].first + h_for_x * i;
-        y = bounds[1].first + h_for_y * i;
-        z = bounds[2].first + h_for_z * i;
+        double x = bounds[0].first + h_for_x * i;
+        double y = bounds[1].first + h_for_y * i;
+        double z = bounds[2].first + h_for_z * i;
 
         result += 0.25 *
         (f({x, bounds[1].first, bounds[2].first}) +
