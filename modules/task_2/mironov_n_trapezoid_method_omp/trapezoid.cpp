@@ -147,7 +147,7 @@ double d1_method_Openmp(
 
     double result = 0;
 
-    #pragma omp parallel private(x) shared(h, bounds, result)
+    #pragma omp parallel
     {
         #pragma omp parallel for
         for (int i = 1; i < N; i++) {
@@ -175,7 +175,7 @@ double d2_method_Openmp(
 
     double result = 0;
 
-    #pragma omp parallel private(x, y) shared(h_for_x, h_for_y, bounds, result)
+    #pragma omp parallel
     {
         #pragma omp parallel for
         for (int i = 1; i < N; i++) {
@@ -222,7 +222,7 @@ double d3_method_Openmp(
 
     double result = 0;
 
-    #pragma omp parallel private(x, y, z) shared(h_for_x, h_for_y, h_for_z, bounds, result)
+    #pragma omp parallel
     {
         #pragma omp parallel for
         for (int i = 1; i < N; i++) {
