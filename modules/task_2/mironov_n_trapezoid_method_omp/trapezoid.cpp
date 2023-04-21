@@ -146,15 +146,11 @@ double d1_method_Openmp(
     double x = 0;
 
     double result = 0;
-
-    #pragma omp parallel
-    {
         #pragma omp parallel for reduction(+: result)
         for (int i = 1; i < N; i++) {
             x = bounds[0].first + h * i;
             result += h * f({x});
         }
-    }
 
     result += (h/2.0) * (f({bounds[0].first}) + f({bounds[0].second}));
 
@@ -174,9 +170,6 @@ double d2_method_Openmp(
     double y = 0;
 
     double result = 0;
-
-    #pragma omp parallel
-    {
         #pragma omp parallel for reduction(+: result)
         for (int i = 1; i < N; i++) {
             x = bounds[0].first + h_for_x * i;
@@ -193,8 +186,6 @@ double d2_method_Openmp(
                 result += f({x, y});
             }
         }
-    }
-
     result += 0.25 *
         (f({bounds[0].first, bounds[1].first}) +
         f({bounds[0].second, bounds[1].second}) +
@@ -221,9 +212,6 @@ double d3_method_Openmp(
     double z = 0;
 
     double result = 0;
-
-    #pragma omp parallel
-    {
         #pragma omp parallel for reduction(+: result)
         for (int i = 1; i < N; i++) {
             x = bounds[0].first + h_for_x * i;
@@ -265,7 +253,6 @@ double d3_method_Openmp(
                 }
             }
         }
-    }
 
     result += 0.125 *
         (f({bounds[0].first, bounds[1].first, bounds[2].first}) +
