@@ -149,7 +149,6 @@ double d1_method_Openmp(
 
     #pragma omp parallel
     {
-        
         #pragma omp parallel for reduction(+: result)
         for (int i = 1; i < N; i++) {
             x = bounds[0].first + h * i;
