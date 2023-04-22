@@ -170,7 +170,7 @@ double d2_method_Openmp(
     double y = 0;
 
     double result = 0;
-        #pragma omp parallel for reduction(+: result)
+        #pragma omp parallel for schedule(static) reduction(+: result)
         for (int i = 1; i < N; i++) {
             x = bounds[0].first + h_for_x * i;
             result += 0.5 * (f({x, bounds[1].first}) +
