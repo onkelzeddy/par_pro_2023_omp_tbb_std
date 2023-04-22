@@ -171,7 +171,7 @@ double d2_method_Openmp(
     double y = 0;
 
     double result = 0;
-    #pragma omp parallel private(i) shared(N, bounds, h_for_x, h_for_y, result)
+    #pragma omp parallel private(i, x, y) shared(N, bounds, h_for_x, h_for_y, result)
     {
         #pragma omp for nowait reduction(+: result)
         for (i = 1; i <= N; i++) {
