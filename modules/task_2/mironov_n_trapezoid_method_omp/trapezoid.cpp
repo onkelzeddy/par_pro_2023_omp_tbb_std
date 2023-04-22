@@ -172,24 +172,22 @@ double d2_method_Openmp(
     double y = 0;
 
     double result = 0;
-    #pragma omp parallel private(i, j, x, y) shared(N, bounds, h_for_x, h_for_y, result)
+    #pragma omp parallel private(i, j, x, y)\
+    shared(N, bounds, h_for_x, h_for_y, result)
     {
         #pragma omp for nowait reduction(+: result)
         for (i = 1; i <= N; i++) {
             x = bounds[0].first + h_for_x * i;
+            y = bounds[1].first + h_for_y * i;
+
             result += 0.5 * (f({x, bounds[1].first}) +
             f({x, bounds[1].second}));
-        }
-
-        #pragma omp for nowait reduction(+: result)
-        for (i = 1; i <= N; i++) {
-            y = bounds[1].first + h_for_y * i;
 
             result += 0.5 * (f({bounds[0].first, y}) +
             f({bounds[0].second, y}));
         }
 
-        #pragma omp for nowait reduction(+: result)
+        #pragma omp for nowait collapse(2) reduction(+: result)
         for (i = 1; i <= N; i++) {
             for (j = 1; j <= N; j++) {
                 x = bounds[0].first + h_for_x * i;
@@ -215,6 +213,9 @@ double d3_method_Openmp(
     const std::vector<std::pair<double, double>>& bounds,
     int N) {
     double doubleStepsCount = N;
+    int i;
+    int j;
+    int s;
 
     double h_for_x = (bounds[0].second - bounds[0].first)/doubleStepsCount;
     double h_for_y = (bounds[1].second - bounds[1].first)/doubleStepsCount;
@@ -225,8 +226,11 @@ double d3_method_Openmp(
     double z = 0;
 
     double result = 0;
-        #pragma omp parallel for reduction(+: result)
-        for (int i = 1; i < N; i++) {
+    #pragma omp parallel private(i, j, s, x, y)\
+    shared(N, bounds, h_for_x, h_for_y, h_for_z, result)
+    {
+        #pragma omp for nowait reduction(+: result)
+        for (i = 1; i <= N; i++) {
             x = bounds[0].first + h_for_x * i;
             y = bounds[1].first + h_for_y * i;
             z = bounds[2].first + h_for_z * i;
@@ -242,30 +246,43 @@ double d3_method_Openmp(
             result += 0.25 *
             (f({bounds[0].first, bounds[1].first, z}) +
             f({bounds[0].second, bounds[1].second, z}));
-            for (int j = 1; j < N; j++) {
-                x = bounds[0].first + h_for_x * i;
+        }
+
+        #pragma omp for nowait collapse(2) reduction(+: result)
+        for (i = 1; i <= N; i++) {
+            x = bounds[0].first + h_for_x * i;
+            y = bounds[1].first + h_for_y * i;
+            for (j = 1; j <= N; j++) {
                 z = bounds[2].first + h_for_z * j;
-
-                result += 0.5 * (f({x, bounds[1].first, z}) +
-                f({x, bounds[1].second, z}));
-
-                y = bounds[1].first + h_for_y * i;
 
                 result += 0.5 * (f({bounds[0].first, y, z}) +
                 f({bounds[0].second, y, z}));
+
+                result += 0.5 * (f({x, bounds[1].first, z}) +
+                f({x, bounds[1].second, z}));
 
                 y = bounds[1].first + h_for_y * j;
 
                 result += 0.5 * (f({x, y, bounds[2].first}) +
                 f({x, y, bounds[2].second}));
 
-                for (int s = 1; s < N; s++) {
+                y = bounds[1].first + h_for_y * i;
+            }
+        }
+
+        #pragma omp for nowait collapse(3) reduction(+: result)
+        for (i = 1; i <= N; i++) {
+            for (j = 1; j <= N; j++) {
+                for (s = 1; s <= N; s++) {
+                    x = bounds[0].first + h_for_x * i;
                     z = bounds[2].first + h_for_z * s;
+                    y = bounds[1].first + h_for_y * j;
 
                     result += f({x, y, z});
                 }
             }
         }
+    }
 
     result += 0.125 *
         (f({bounds[0].first, bounds[1].first, bounds[2].first}) +
