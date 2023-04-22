@@ -162,6 +162,7 @@ double d2_method_Openmp(
     const std::vector<std::pair<double, double>>& bounds,
     int N) {
     double doubleStepsCount = N;
+    int i;
 
     double h_for_x = (bounds[0].second - bounds[0].first)/doubleStepsCount;
     double h_for_y = (bounds[1].second - bounds[1].first)/doubleStepsCount;
@@ -170,22 +171,33 @@ double d2_method_Openmp(
     double y = 0;
 
     double result = 0;
-        #pragma omp parallel for schedule(static) reduction(+: result)
-        for (int i = 1; i < N; i++) {
+    #pragma omp parallel private(i) shared(N, bounds, h_for_x, h_for_y, result)
+    {
+        #pragma omp for nowait reduction(+: result)
+        for (i = 1; i <= N; i++) {
             x = bounds[0].first + h_for_x * i;
             result += 0.5 * (f({x, bounds[1].first}) +
             f({x, bounds[1].second}));
+        }
 
+        #pragma omp for nowait reduction(+: result)
+        for (i = 1; i <= N; i++) {
             y = bounds[1].first + h_for_y * i;
 
             result += 0.5 * (f({bounds[0].first, y}) +
             f({bounds[0].second, y}));
+        }
+
+        #pragma omp for nowait reduction(+: result)
+        for (i = 1; i <= N; i++) {
             for (int j = 1; j < N; j++) {
+                x = bounds[0].first + h_for_x * i;
                 y = bounds[1].first + h_for_y * j;
 
                 result += f({x, y});
             }
         }
+    }
     result += 0.25 *
         (f({bounds[0].first, bounds[1].first}) +
         f({bounds[0].second, bounds[1].second}) +
