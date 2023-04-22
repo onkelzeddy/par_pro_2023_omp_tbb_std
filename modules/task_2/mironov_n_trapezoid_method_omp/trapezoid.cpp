@@ -163,6 +163,7 @@ double d2_method_Openmp(
     int N) {
     double doubleStepsCount = N;
     int i;
+    int j;
 
     double h_for_x = (bounds[0].second - bounds[0].first)/doubleStepsCount;
     double h_for_y = (bounds[1].second - bounds[1].first)/doubleStepsCount;
@@ -171,7 +172,7 @@ double d2_method_Openmp(
     double y = 0;
 
     double result = 0;
-    #pragma omp parallel private(i, x, y) shared(N, bounds, h_for_x, h_for_y, result)
+    #pragma omp parallel private(i, j, x, y) shared(N, bounds, h_for_x, h_for_y, result)
     {
         #pragma omp for nowait reduction(+: result)
         for (i = 1; i <= N; i++) {
@@ -190,7 +191,7 @@ double d2_method_Openmp(
 
         #pragma omp for nowait reduction(+: result)
         for (i = 1; i <= N; i++) {
-            for (int j = 1; j < N; j++) {
+            for (j = 1; j <= N; j++) {
                 x = bounds[0].first + h_for_x * i;
                 y = bounds[1].first + h_for_y * j;
 
